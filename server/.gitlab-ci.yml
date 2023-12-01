@@ -1,0 +1,68 @@
+stages:
+- build
+- test
+- package 
+- deploy
+
+build_sample-app:
+  stage: build
+  image: registry.infra.connectwork.fr/expressweb/devops/php8:main
+  script:
+    - cd sample-app/
+    - cat ${ENV} > .env
+    - composer install
+  artifacts:
+    paths:
+      - sample-app/
+
+test_sample-app:
+  stage: test
+  image: registry.infra.connectwork.fr/expressweb/devops/php8:main
+  script:
+    - cd sample-app/
+    - php artisan migrate:fresh
+    - php artisan db:seed
+    - vendor/bin/phpunit
+  needs:
+    - job: "build_sample-app"
+      artifacts: true
+
+docker_php_sample-app:
+  stage: package
+  image: "quay.io/buildah/stable:v1.21.0"
+  variables:
+    BUILD_NAME: "sample-app"
+    DOCKER_PATH: ${CI_PROJECT_DIR}/server/images/Dockerfile
+    DOCKER_CONTEXT: ${CI_PROJECT_DIR}/
+    BUILD_VERSION: ${CI_COMMIT_REF_SLUG}
+    BUILD_REGISTRY: ${CI_REGISTRY_IMAGE}
+    FULL_IMAGE_NAME: ${BUILD_REGISTRY}/${BUILD_NAME}:${BUILD_VERSION}
+    DOCKER_OPTIONS: ""
+  script:
+    - buildah login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - buildah login -u "$CI_DEPENDENCY_PROXY_USER" -p "$CI_DEPENDENCY_PROXY_PASSWORD" $CI_DEPENDENCY_PROXY_SERVER
+    - buildah bud --pull ${DOCKER_OPTIONS} -t "$FULL_IMAGE_NAME" -f ${DOCKER_PATH} ${DOCKER_CONTEXT}
+    - buildah push $FULL_IMAGE_NAME
+  needs:
+    - job: "build_sample-app"
+      artifacts: true
+
+deploy-test:
+  stage: deploy
+  image:
+    name: line/kubectl-kustomize:1.23.6-4.5.4
+    entrypoint: [""]
+  variables:
+    KUBECONFIG: /tmp/kubeconfig
+    GIT_STRATEGY: fetch
+    GIT_SUBMODULE_STRATEGY: none
+    KUBE_CLUSTER: cw-hosting-dev
+    DEPLOY_ENV: dev
+    KUBE_NAMESPACE: epitech
+  before_script:
+    - if [ -z "${KUBECONFIG_DEV}" ]; then echo "The KUBECONFIG_DEV var is unset" && exit 1; else echo ${KUBECONFIG_DEV} | base64 -d > ${KUBECONFIG}; fi
+    - apk add --no-cache gettext libintl
+  script:
+    - kustomize build . | envsubst | kubectl diff -n ${KUBE_NAMESPACE} -f - || true
+    - kustomize build . | envsubst | kubectl apply -n ${KUBE_NAMESPACE} -f -
+  needs: ["docker_php_sample-app"]

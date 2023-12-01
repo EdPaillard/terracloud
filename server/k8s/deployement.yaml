@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-app
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: sample-app
+        tier: backend
+    spec:
+      containers:
+      - name: php
+        image: registry.infra.connectwork.fr/epitech/sample-app/sample-app:master
+        imagePullPolicy: Always
+        command: ["php"]
+        args: ["artisan", "serve"]
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8000
