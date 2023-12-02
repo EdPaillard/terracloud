@@ -4,10 +4,10 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "80:80"
   mysql:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
