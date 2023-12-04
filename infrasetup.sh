@@ -12,9 +12,9 @@ create() {
     echo -e "\n${GREEN}Terraform init${ENDCOLOR}\n"
     terraform init
     echo -e "\n${GREEN}Terraform plan${ENDCOLOR}\n"
-    terraform plan -out=tfplan
+    terraform plan -var client_id=$CLIENT_ID -var client_secret=$CLIENT_SECRET -var tenant_id=$TENANT_ID -var subscription_id=$SUBSCRIPTION_ID -out=tfplan 
     echo -e "\n${GREEN}Terraform apply${ENDCOLOR}\n"
-    TF_VAR_client_id=$CLIENT_ID TF_VAR_client_secret=$CLIENT_SECRET TF_VAR_tenant_id=$TENANT_ID TF_VAR_subscription_id=$SUBSCRIPTION_ID terraform apply tfplan
+    terraform apply tfplan
 
     if [[ $? != 0 ]]; then
         echo "An error occured while applying infrastructure with terraform"
