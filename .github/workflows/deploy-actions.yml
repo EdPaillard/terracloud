@@ -27,8 +27,8 @@ jobs:
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+        # with:
+        #   cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
   ansible:
     name: 'Install Ansible'
     runs-on: ubuntu-latest
@@ -67,12 +67,21 @@ jobs:
       
       - name: Echo Private key into file
         run: 'echo "$SSH_KEY" > ansible/.ssh/id_rsa'
+        env:
+          SSH_KEY: ${{secrets.SSH_KEY}}
 
       - name: Echo Private key into file
         run: 'echo "$SSH_KEY_PUB" > ansible/.ssh/id_rsa.pub'
+        env:
+          SSH_KEY_PUB: ${{secrets.SSH_KEY_PUB}}
 
       - name: Set correct permission on private key
         run: chmod 600 ansible/.ssh/id_rsa
 
       - name: Deploy infra
         run: ./infrasetup.sh create
+        env:
+          CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
+          CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
+          TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
+          SUBSCRIPTION_ID: ${{secrets.AZURE_SUBSCRIPTION_ID}}
