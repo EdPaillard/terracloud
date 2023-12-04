@@ -1,24 +1,24 @@
-name: 'Azure Login'
+# name: 'Azure Login'
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
 
-permissions:
-  id-token: write
-  contents: read
+# permissions:
+#   id-token: write
+#   contents: read
 
-jobs:
-  azure:
-    name: 'Azure'
-    runs-on: ubuntu-latest
-    steps:
+# jobs:
+#   azure:
+#     name: 'Azure'
+#     runs-on: ubuntu-latest
+#     steps:
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}          
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          allow-no-subscriptions: true
+#       - name: Azure Login
+#         uses: azure/login@v1
+#         with:
+#           client-id: ${{ secrets.AZURE_CLIENT_ID }}          
+#           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#           allow-no-subscriptions: true
 
