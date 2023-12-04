@@ -1,0 +1,18 @@
+---
+- name: Create MYSQL database
+  become: true
+  community.mysql.mysql_db:
+    check_implicit_admin: true
+    name: "{{ db_name }}"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create user for "{{ db_name }}" database
+  become: true
+  community.mysql.mysql_user:
+    check_implicit_admin: true
+    state: present
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: '*.*:ALL,GRANT'
+    login_unix_socket: /var/run/mysqld/mysqld.sock

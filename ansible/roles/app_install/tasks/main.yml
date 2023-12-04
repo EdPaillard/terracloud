@@ -1,0 +1,50 @@
+---
+- name: Clone laravel app repo
+  ansible.builtin.git:
+    repo: https://github.com/EdPaillard/terracloud
+    dest: /home/terracloud/laravel
+
+- name: Copy .env
+  template:
+    src: .env.j2
+    dest: /home/terracloud/laravel/.env
+
+- name: Start laravel docker-compose
+  become: true
+  community.docker.docker_compose:
+    project_src: /home/terracloud/laravel/
+  register: output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: output
+
+# - name: Run migrations
+#   become: true
+#   community.docker.docker_container_exec:
+#     container: laravel_app
+#     command: "php artisan migrate -q"
+#   register: resultmig
+
+# - name: Print stdout
+#   ansible.builtin.debug:
+#     var: resultmig.stdout
+
+# - name: Run db:seed
+#   become: true
+#   community.docker.docker_container_exec:
+#     container: laravel_app
+#     command: "php artisan db:seed -q"
+#   register: resultdbs
+
+# - name: Print stdout
+#   ansible.builtin.debug:
+#     var: resultdbs.stdout
+
+# - name: Run migrations
+#   become: yes
+#   command: docker exec -it laravel_app php artisan migrate -q
+
+# - name: Run db seed
+#   become: yes
+#   command: docker exec -it laravel_app php artisan db:seed -q

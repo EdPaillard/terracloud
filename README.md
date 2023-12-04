@@ -1,32 +1,55 @@
-# Sample app
+# Terracloud Setup - IAAS
 
-- Utilise une base mysql
-- Site en PHP
-- Gestion schéma DB 
-- Tests
-- Déploiement kube
+## Tools
+- Terraform
+- Ansible
+- Docker/Docker-compose
+- Azure
 
-## Avant tout votre fichier .env 
+## Que se passe-t-il ?
+1. Déploiement via Terraform de l'infrastructure sur Azure dans un dev test lab.
+2. Playbook ansible pour configurer les VMs
+  - Installation des utilitaires
+  - Installation de Docker
+  - Clone et lancement de l'application
 
-Créer un fichier .env dans le dossier sample-app du repo
+## Process
+> :warning: placement des variables d'environnements dans un fichier group_vars/all.yml
 
-```conf
-DB_CONNECTION=mysql
-DB_HOST=xxx.xxx.xxx.xxx
-DB_PORT=3306
-DB_DATABASE=db_name
-DB_USERNAME=username
-DB_PASSWORD=passwd
+```sh
+cd ansible
+mkdir group_vars
+cat <<EOF >>group_vars/all.yml
+db_name: <<placeholder>>
+db_user: <<placeholder>>
+db_password: <<placeholder>>
+db_host: <<placeholder>>
+db_admin_password: <<placeholder>>
+EOF
 ```
 
-## Création du schéma 
-
-```bash
-php artisan migrate
+1. Lancer **infrasetup.sh** à la racine du projet
+```sh
+./infrasetup.sh create
 ```
+2. ... C'est tout !
 
-## Seed du jeu de données 
+## Metrics
+Réflexion sur les outils
+- Possibilité d'utiliser les outils Azure ?
+  - Metrics
+  - Alert
+  - ...
+- JMeter ?
 
-```bash
-php artisan db:seed
-```
+# Releases
+- v1.0.0 - 4/12/2023
+
+## To Do
+- Kube
+  1. Transition vers Kubernetes k3S
+  2. Configuration fluxcd
+  3. Installation helm automatique du monitoring et de l'application
+- Template
+  1. Utilisation d'Azure VM Template
+  2. Possibilité d'utiliser Packer ?
