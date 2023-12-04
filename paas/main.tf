@@ -72,7 +72,7 @@ resource "azurerm_linux_web_app" "webappcontapp" {
 
 resource "azurerm_app_service_source_control" "source_control" {
   app_id                 = azurerm_linux_web_app.webappcontapp.id
-  repo_url               = "https://github.com/EdPaillard/terracloud.git"
+  repo_url               = "https://github.com/EdPaillard/terracloud.git/sample-app-master"
   branch                 = "main"
   use_manual_integration = true
 }
