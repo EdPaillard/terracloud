@@ -27,7 +27,7 @@ resource "azurerm_dev_test_linux_virtual_machine" "terracloud_vm" {
   location               = data.azurerm_resource_group.terracloud.location
   size                   = "Standard_A4_v2"
   username               = var.username
-  ssh_key                = file("~/.ssh/azure/id_rsa.pub")
+  ssh_key                = file("ansible/.ssh/id_rsa.pub")
   lab_virtual_network_id = data.azurerm_dev_test_virtual_network.terracloud_vnet.id
   lab_subnet_name        = data.azurerm_subnet.terracloud_subnet.name
   storage_type           = "Standard"
