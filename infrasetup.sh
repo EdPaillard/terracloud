@@ -12,7 +12,7 @@ create() {
     echo -e "\n${GREEN}Terraform init${ENDCOLOR}\n"
     terraform init
     echo -e "\n${GREEN}Terraform plan${ENDCOLOR}\n"
-    terraform plan -var client_id=$CLIENT_ID -var client_secret=$CLIENT_SECRET -var tenant_id=$TENANT_ID -var subscription_id=$SUBSCRIPTION_ID -out=tfplan 
+    terraform plan -out=tfplan # -var client_id=$CLIENT_ID -var client_secret=$CLIENT_SECRET -var tenant_id=$TENANT_ID -var subscription_id=$SUBSCRIPTION_ID 
     echo -e "\n${GREEN}Terraform apply${ENDCOLOR}\n"
     terraform apply tfplan
 
