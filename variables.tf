@@ -44,7 +44,7 @@ variable "password" {
 }
 
 variable "array" {
-  type = number
+  type    = number
   default = 2
 }
 // Dtl

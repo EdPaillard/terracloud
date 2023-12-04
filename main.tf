@@ -1,5 +1,5 @@
 data "azurerm_resource_group" "terracloud" {
-  name     = var.resource_group_name
+  name = var.resource_group_name
 }
 
 data "azurerm_dev_test_lab" "terracloud_dev_test_lab" {
@@ -14,13 +14,13 @@ data "azurerm_dev_test_virtual_network" "terracloud_vnet" {
 }
 
 data "azurerm_subnet" "terracloud_subnet" {
-  name                                           = var.subnet
-  virtual_network_name                           = data.azurerm_dev_test_virtual_network.terracloud_vnet.name
-  resource_group_name                            = data.azurerm_resource_group.terracloud.name
+  name                 = var.subnet
+  virtual_network_name = data.azurerm_dev_test_virtual_network.terracloud_vnet.name
+  resource_group_name  = data.azurerm_resource_group.terracloud.name
 }
 
 resource "azurerm_dev_test_linux_virtual_machine" "terracloud_vm" {
-  count = 3
+  count                  = 3
   name                   = "${var.name}-vm${count.index}"
   lab_name               = data.azurerm_dev_test_lab.terracloud_dev_test_lab.name
   resource_group_name    = data.azurerm_resource_group.terracloud.name
@@ -32,7 +32,7 @@ resource "azurerm_dev_test_linux_virtual_machine" "terracloud_vm" {
   lab_subnet_name        = data.azurerm_subnet.terracloud_subnet.name
   storage_type           = "Standard"
   notes                  = "TerraCloud VMs"
-  allow_claim = false
+  allow_claim            = false
 
   gallery_image_reference {
     publisher = "Canonical"
@@ -80,10 +80,10 @@ resource "azurerm_dev_test_linux_virtual_machine" "terracloud_vm" {
 
 # resource "null_resource" "start_vm_if_needed" {
 #   depends_on = [azurerm_dev_test_linux_virtual_machine.terracloud_vm1, azurerm_dev_test_linux_virtual_machine.terracloud_vm2]
-  # triggers = {
-  #   vm_id = azurerm_dev_test_linux_virtual_machine.terracloud_vm1.id,
-  #   vm2_id = azurerm_dev_test_linux_virtual_machine.terracloud_vm2.id
-  # }
+# triggers = {
+#   vm_id = azurerm_dev_test_linux_virtual_machine.terracloud_vm1.id,
+#   vm2_id = azurerm_dev_test_linux_virtual_machine.terracloud_vm2.id
+# }
 #   provisioner "local-exec" {
 #     command = "az lab vm start -g ${data.azurerm_resource_group.terracloud.name} --lab-name ${data.azurerm_dev_test_lab.terracloud_dev_test_lab.name} --name ${azurerm_dev_test_linux_virtual_machine.terracloud_vm1.name} || true; az lab vm start -g ${data.azurerm_resource_group.terracloud.name} --lab-name ${data.azurerm_dev_test_lab.terracloud_dev_test_lab.name} --name ${azurerm_dev_test_linux_virtual_machine.terracloud_vm2.name} || true;"
 #   }
