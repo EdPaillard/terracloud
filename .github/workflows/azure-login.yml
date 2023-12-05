@@ -15,8 +15,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }} 
+      - name: test home
+        run: cd
+
+      - name: test home dir
+        run: pwd
+
+      - name: Create azure folder
+        run: mkdir ~/.azure
+
+      - name: Create profile creds
+        run: touch ~/.azure/azureProfile.json
+
+      - name: Good file perm
+        run: chmod 664 ~/.azure/azureProfile.json
+
+      - name: Write azureProfile
+        run: echo ${{ secrets.AZURE_CREDENTIALS }} > ~/.azure/azureProfile.json
+
+      # - name: Azure Login
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }} 
 
