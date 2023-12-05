@@ -35,7 +35,10 @@ jobs:
 
       - name: Write azureProfile
         run: echo ${{ secrets.AZURE_CREDENTIALS }} > ~/.azure/azureProfile.json
-        
+
+      - name: Check azureProfile
+        run: cat ~/.azure/azureProfile.json
+
   terraform:
     name: 'Install terraform'
     runs-on: ubuntu-latest
@@ -77,7 +80,7 @@ jobs:
           pip install ansible requests
 
   deploy:
-    needs: [terraform, ansible]
+    needs: [terraform, ansible, azure]
     name: 'Actual deployment'
     runs-on: ubuntu-latest
     environment: production
