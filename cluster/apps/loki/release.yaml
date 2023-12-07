@@ -1,0 +1,54 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: monitoring
+spec:
+  releaseName: loki
+  dependsOn:
+    - name: prometheus
+  chart:
+    spec:
+      chart: loki-stack
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      version: 2.9.10
+  interval: 5m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+  values:
+    loki:
+      enabled: true
+      isDefault: false
+      ingress:
+        enabled: false
+      config:
+        compactor:
+          retention_enabled: true
+    promtail:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      rbac:
+        pspEnabled: true
+      containerSecurityContext:
+        privileged: True
+        allowPrivilegeEscalation: True
+      tolerations:
+        - key: "CriticalAddonsOnly"
+          operator: Exists
+          effect: "NoExecute"
+    grafana:
+      sidecar:
+        datasources:
+          enabled: false

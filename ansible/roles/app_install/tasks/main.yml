@@ -1,4 +1,26 @@
 ---
+- name: Create docker registry
+  community.docker.docker_container:
+    name: registry
+    image: registry
+    ports:
+     - "5000:5000"
+    restart_policy: always
+    volumes:
+      - /etc/prometheus:/etc/prometheus
+  when: inventory_hostname in groups['masters']
+
+- name: Get registry ip
+  set_fact:
+    registry_ip: "{{ ansible_default_ipv4.address }}"
+  when: inventory_hostname in groups['masters']
+
+- name: Write daemon.json
+  become: yes
+  template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
 - name: Clone laravel app repo
   ansible.builtin.git:
     repo: https://github.com/EdPaillard/terracloud
@@ -9,15 +31,29 @@
     src: .env.j2
     dest: /home/terracloud/laravel/.env
 
-- name: Start laravel docker-compose
-  become: true
-  community.docker.docker_compose:
-    project_src: /home/terracloud/laravel/
-  register: output
+- name: Build terracloud app and push to registry
+  community.docker.docker_image:
+    build:
+      path: /home/terracloud/laravel
+    name: "{{ registry_ip }}:5000/terracloud-laravel"
+    push: true
+    source: build
 
-- name: Show results
-  ansible.builtin.debug:
-    var: output
+- name: Complete deployment image name
+  lineinfile:
+    path: /home/squalli/Documents/Epitech/Terracloud-Actions/app-kube/deployment.yaml
+    regexp: "*.image: terracloud.*"
+    line: "        image: '{{ registry_ip }}:5000/terracloud-laravel'"
+
+# - name: Start laravel docker-compose
+#   become: true
+#   community.docker.docker_compose:
+#     project_src: /home/terracloud/laravel/
+#   register: output
+
+# - name: Show results
+#   ansible.builtin.debug:
+#     var: output
 
 # - name: Run migrations
 #   become: true

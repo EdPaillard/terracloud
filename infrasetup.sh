@@ -54,6 +54,13 @@ create() {
         echo -e "    $vm_fqdn:" >> ansible/inventory/hosts.yml
     done
 
+    echo -e "\n${GREEN}Adding groups to hosts.yml${ENDCOLOR}:\n"
+    echo -e "  children:\n  masters:\n  hosts:" >> ansible/inventory/hosts.yml
+    echo -e "        ${vm_fqdns[0]}:" >> ansible/inventory/hosts.yml
+    echo -e "    workers:\n  hosts:" >> ansible/inventory/hosts.yml
+    echo -e "        ${vm_fqdns[1]}:" >> ansible/inventory/hosts.yml
+    echo -e "        ${vm_fqdns[2]}:" >> ansible/inventory/hosts.yml
+
     echo -e "\n${GREEN}Running Ansible playbook${ENDCOLOR}:\n"
     ansible-playbook -i ansible/inventory/hosts.yml ansible/configuration.yml
 }

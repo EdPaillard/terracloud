@@ -1,0 +1,22 @@
+---
+- name: Download flux
+  get_url:
+    url: https://fluxcd.io/install.sh
+    dest: /tmp/install.sh
+
+- name: Install flux
+  shell: /tmp/install.sh
+
+- name: Fluxcd bootstrap
+  shell: flux boostrap github --token-auth --owner=EdPaillard --repository=terracloud --branch=main --path=../cluster/terracloud --personal
+  environment:
+    GITHUB_TOKEN: "{{ github_token }}"
+
+- name: Create a pod
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: terracloud

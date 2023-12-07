@@ -1,0 +1,88 @@
+---
+- name: Create k3s config folder
+  file:
+    path: /etc/rancher/k3s
+    state: directory
+
+- name: Copy k3s config.yaml
+  become: yes
+  template:
+    src: config.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml
+
+- name: Get k3s binary
+  become: yes
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /usr/local/bin/k3s
+
+- name: Install k3s server
+  command: k3s server
+  when: inventory_hostname in groups['masters']
+    
+- name: Install k3s agent
+  command: k3s agent
+  when: inventory_hostname in groups['workers']
+
+- name: Enable k3s service
+  service:
+    name: k3s
+    state: started
+    enabled: yes
+
+- name: Create kube config folder
+  file:
+    path: ~/.kube
+    state: directory
+
+- name: Manage kubeconfig
+  block:
+    - name: Get kubeconfig
+      fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ~/.kube/config
+        flat: yes
+
+    - name: Fix right on kubeconfig
+      local_actions:
+        module: file
+        path: ~/.kube/config
+        mode: "0600"
+
+    - name: Fix content of kubeconfig
+      local_actions:
+        module: lineinfile
+        path: ~/.kube/config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '    server:.*', line: '    server: https://cluster.terracloud.lille:6443' }
+  become: yes
+  when: inventory_hostname in groups['masters']
+
+- name: Fetch etcd-certs
+  block:
+    - name: Create temp etcd-creds folder
+      file:
+        path: /tmp/etcd-creds
+        state: directory
+
+    - name: Fetch server-ca.crt
+      fetch:
+        src: /var/lib/rancher/k3s/server/tls/etcd/server-ca.crt
+        dest: /tmp/etcd-creds/
+        flat: yes
+
+    - name: Fetch server-client.crt
+      fetch:
+        src: /var/lib/rancher/k3s/server/tls/etcd/server-client.crt
+        dest: /tmp/etcd-creds/
+        flat: yes
+
+    - name: Fetch server-client.key
+      fetch:
+        src: /var/lib/rancher/k3s/server/tls/etcd/server-client.key
+        dest: /tmp/etcd-creds/
+        flat: yes
+  become: yes
+  when: inventory_hostname in groups['masters']

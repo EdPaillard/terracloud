@@ -1,0 +1,150 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  releaseName: prometheus
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus
+        namespace: flux-system
+      version: 45.31.1
+  interval: 5m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+  values:
+    global:
+      pspEnabled: false
+
+    alertmanager:
+      enabled: false
+
+    grafana:
+      enabled: true
+      image:
+        repository: grafana/grafana
+      defaultDashboardsTimezone: Europe/Paris
+      deploymentStrategy:
+        type: Recreate
+      rbac:
+        pspEnabled: false
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-terracloud
+          cert-manager.io/common-name: grafana.terracloud.internal
+        hosts:
+          - grafana.terracloud.internal
+        ingressClassName: traefik
+        path: /
+        tls:
+          - secretName: grafana-general-tls
+            hosts:
+            - grafana.terracloud.internal
+      sidecar:
+        image:
+          repository: kiwigrid/k8s-sidecar
+        datasources:
+          defaultDatasourceEnabled: false
+      additionalDataSources:
+        - name: Terracloud
+          type: prometheus
+          uid: prometheus
+          url: http://prometheus-kube-prometheus-prometheus.monitoring:9090/
+          access: proxy
+          isDefault: false
+          jsonData:
+            timeInterval: 30s
+        - name: Terracloud-Logs
+          type: loki
+          uid: Terracloud-Logs
+          url: http://loki:3100/
+          access: proxy
+          isDefault: false
+      # extraConfigmapMounts: 
+      #   - name: grafana-cacert
+      #     configMap: grafana-cacert
+      #     mountPath: /etc/grafana/ssl/CACert.pem
+      #     subPath: CACert.pem
+      #     readOnly: true
+      persistence:
+        enabled: true
+        storageClassName: storage-class-test
+        existingClaim: pvc-grafana
+      initChownData:
+        enabled: false
+      grafana.ini:
+        auth.ldap:
+          enabled: false
+      ldap:
+        enabled: false
+
+    kubeControllerManager:
+      insecureSkipVerify: true  
+
+    kubeEtcd:
+      service:
+        enabled: true
+        port: 2379
+        targetPort: 2379
+      serviceMonitor:
+        scheme: https
+        serverName: localhost
+        caFile: /etc/prometheus/secrets/etcd-client-cert/etcd-ca
+        certFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client
+        keyFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client-key      
+
+    kubeScheduler:
+      insecureSkipVerify: true   
+
+    prometheus-node-exporter:
+      tolerations:
+        - key: "CriticalAddonsOnly"
+          operator: Exists
+          effect: "NoExecute"
+
+    prometheus:
+      serviceAccount:
+        name: "prometheus"
+      ingress:
+        enabled: true
+        # annotations:
+        #   cert-manager.io/cluster-issuer: vault-issuer
+        #   cert-manager.io/common-name: prometheus.terracloud.internal
+        hosts:
+          - prometheus.terracloud.internal
+        ingressClassName: traefik
+        pathType: ImplementationSpecific
+        tls:
+          - secretName: prometheus-general-tls
+            hosts:
+              - prometheus.terracloud.internal
+      prometheusSpec:
+        secrets:
+          - etcd-client-cert
+          - ca-cert
+        retention: 62d
+        retentionSize: 35GB
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: storage-class-test
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 36Gi
+        #ruleNamespaceSelector:
+        #  any: true
+        #serviceMonitorSelector:
+          #matchLabels:
+            #prometheus: todiscover
+        serviceMonitorSelectorNilUsesHelmValues: false
+        additionalScrapeConfigs: []

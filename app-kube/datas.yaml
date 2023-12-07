@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: terracloud-secret
+  namespace: terracloud
+type: Opaque
+data:
+  mysql_user: bGFyYXZlbA==
+  mysql_root_password: bGFyYXZlbC1yb290
+  mysql_password: bGFyYXZlbA==
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terracloud-configmap
+  namespace: terracloud
+data:
+  mysql_dbname: laravel
+  mysql_host: terracloud-mysql

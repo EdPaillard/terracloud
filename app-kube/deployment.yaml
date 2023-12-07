@@ -1,0 +1,83 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terracloud
+  labels:
+    app: terracloud
+  namespace: terracloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: terracloud
+  template:
+    metadata:
+      labels:
+        app: terracloud
+    spec:
+      containers:
+      - name: terracloud
+        image: terracloud
+        ports:
+        - containerPort: 80
+        env:
+          - name: REACT_APP_API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: terracloud-configmap
+                key: backend_url
+          - name: REACT_APP_API_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: terracloud-configmap
+                key: backend_port
+          - name: REACT_APP_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: terracloud-secret
+                key: secret_key
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terracloud-mysql
+  labels:
+    app: terracloud-mysql
+  namespace: terracloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: terracloud-mysql
+  template:
+    metadata:
+      labels:
+        app: terracloud-mysql
+    spec:
+      containers:
+      - name: terracloud-mysql
+        image: mysql
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: terracloud-secret
+                key: mysql_root_password
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: terracloud-configmap
+                key: mysql_dbname
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: terracloud-secret
+                key: mysql_user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: terracloud-secret
+                key: mysql_password

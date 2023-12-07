@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: terracloud-service
+  labels:
+    app: terracloud-service
+  namespace: terracloud
+spec:
+  # type: LoadBalancer
+  selector:
+      app: terracloud
+  ports:
+    - name: http-client
+      port: 80
+      targetPort: 80
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: terracloud-mysql
+  labels:
+    app: terracloud-mysql
+  namespace: terracloud
+spec:
+  selector:
+    app: terracloud-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306

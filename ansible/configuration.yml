@@ -2,5 +2,13 @@
   roles:
     - vm_setup
     - docker_install
-    # - mysql
+    - k3s
     - app_install
+    # - mysql
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+
+  roles:
+    - fluxcd
