@@ -1,6 +1,0 @@
-- hosts: all
-  roles:
-    - vm_setup
-    - docker_install
-    # - mysql
-    - app_install
