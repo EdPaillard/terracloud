@@ -2,7 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: loki
-  namespace: flux-system
+  namespace: monitoring
 spec:
   releaseName: loki
   dependsOn:
@@ -13,7 +13,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana
-        namespace: monitoring
+        namespace: flux-system
       version: 2.9.10
   interval: 5m
   install:
@@ -40,7 +40,7 @@ spec:
           cpu: 100m
           memory: 128Mi
       rbac:
-        pspEnabled: true
+        pspEnabled: false
       containerSecurityContext:
         privileged: True
         allowPrivilegeEscalation: True
