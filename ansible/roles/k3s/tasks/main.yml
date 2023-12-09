@@ -1,63 +1,114 @@
 ---
+- name: Check if k3s.service is running
+  become: yes
+  shell: systemctl is-active k3s.service
+  register: k3s_status
+  ignore_errors: true
+
+- name: Check if k3s-agent.service is running
+  become: yes
+  shell: systemctl is-active k3s-agent.service
+  register: k3s_agent_status
+  ignore_errors: true
+
 - name: Create k3s config folder
+  become: yes
   file:
     path: /etc/rancher/k3s
     state: directory
 
-- name: Copy k3s config.yaml
-  become: yes
-  template:
-    src: config.yaml.j2
-    dest: /etc/rancher/k3s/config.yaml
+# - name: Copy k3s config.yaml on master
+#   become: yes
+#   template:
+#     src: config.yaml.j2
+#     dest: /etc/rancher/k3s/config.yaml
+#   when: inventory_hostname in groups['masters'] and k3s_status.rc != 0
 
 - name: Get k3s binary
   become: yes
   ansible.builtin.get_url:
     url: https://get.k3s.io
     dest: /usr/local/bin/k3s
+  when: k3s_status.rc != 0
+
+- name: Chmod +x k3s
+  become: yes
+  file:
+    path: /usr/local/bin/k3s
+    mode: '0777'
+  when: k3s_status.rc != 0
 
 - name: Install k3s server
-  command: k3s server
+  become: yes
+  command: "k3s server --node-name {{ groups['masters'][0] }} --write-kubeconfig-mode '644'"
+  when: inventory_hostname in groups['masters'] and k3s_status.rc != 0
+  # environment:
+  #   K3S_KUBECONFIG_MODE: '644'
+  #   K3S_NODE_NAME: groups['masters'][0]
+
+- name: get server token
+  become: yes
+  ansible.builtin.slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: server_token
   when: inventory_hostname in groups['masters']
+
+- debug:
+    msg: "{{ hostvars[groups['masters'][0]]['server_token'].content | b64decode }}"
     
 - name: Install k3s agent
-  command: k3s agent
-  when: inventory_hostname in groups['workers']
+  become: yes
+  command: "k3s agent --token {{ hostvars[groups['masters'][0]]['server_token'].content | b64decode }} --server https://{{ groups['masters'][0] }}:6443"
+  when: inventory_hostname in groups['workers'] and k3s_agent_status.rc != 0
+  # environment:
+  #   K3S_URL: "https://{{ groups['masters'][0] }}:6443"
+  #   K3S_TOKEN: "{{ hostvars[groups['masters'][0]]['server_token'].content | b64decode }}"
 
 - name: Enable k3s service
+  become: yes
   service:
     name: k3s
     state: started
     enabled: yes
+  when: inventory_hostname in groups['masters']
+
+- name: Enable k3s service
+  become: yes
+  service:
+    name: k3s-agent
+    state: started
+    enabled: yes
+  when: inventory_hostname in groups['workers']
 
 - name: Create kube config folder
   file:
     path: ~/.kube
     state: directory
+  delegate_to: localhost
 
 - name: Manage kubeconfig
   block:
     - name: Get kubeconfig
+      become: yes
       fetch:
         src: /etc/rancher/k3s/k3s.yaml
         dest: ~/.kube/config
         flat: yes
 
     - name: Fix right on kubeconfig
-      local_actions:
+      local_action:
         module: file
         path: ~/.kube/config
         mode: "0600"
 
     - name: Fix content of kubeconfig
-      local_actions:
+      local_action:
         module: lineinfile
         path: ~/.kube/config
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
       loop:
-        - { regexp: '    server:.*', line: '    server: https://cluster.terracloud.lille:6443' }
-  become: yes
+        - { regexp: '    server:.*', line: '    server: https://{{ groups["masters"][0] }}:6443' }
   when: inventory_hostname in groups['masters']
 
 - name: Fetch etcd-certs

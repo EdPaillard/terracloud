@@ -1,10 +1,10 @@
+{% if (inventory_hostname in groups['masters']) %}
 write-kubeconfig-mode: "0644"
-tls-san:
-  - "terracloud.local"
-node-label:
-  - "terracloud=lille"
+node-name:
+  - {{ groups['masters'][0] }}
 flannel-backend: none
-token: {{ k3s_token }}
+{% endif %}
 {% if (inventory_hostname in groups['workers']) %}
-server: https://cluster.terracloud.lille.local:9345
+token: {{ hostvars[groups['masters'][0]]['server_token'].content }}
+server: https://{{ groups['masters'][0] }}:9345
 {% endif %}

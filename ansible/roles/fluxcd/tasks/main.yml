@@ -8,7 +8,7 @@
   shell: /tmp/install.sh
 
 - name: Fluxcd bootstrap
-  shell: flux boostrap github --token-auth --owner=EdPaillard --repository=terracloud --branch=main --path=../cluster/terracloud --personal
+  shell: flux boostrap github --token-auth --owner=EdPaillard --repository=terracloud --branch=release/k3s --path=../cluster/terracloud --personal
   environment:
     GITHUB_TOKEN: "{{ github_token }}"
 

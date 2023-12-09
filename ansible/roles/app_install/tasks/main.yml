@@ -10,15 +10,10 @@
       - /etc/prometheus:/etc/prometheus
   when: inventory_hostname in groups['masters']
 
-- name: Get registry ip
-  set_fact:
-    registry_ip: "{{ ansible_default_ipv4.address }}"
-  when: inventory_hostname in groups['masters']
-
 - name: Write daemon.json
   become: yes
   template:
-    src: daemon.json
+    src: daemon.json.j2
     dest: /etc/docker/daemon.json
 
 - name: Clone laravel app repo
@@ -29,21 +24,16 @@
 - name: Copy .env
   template:
     src: .env.j2
-    dest: /home/terracloud/laravel/.env
+    dest: /home/terracloud/laravel/sample-app-master/.env
 
 - name: Build terracloud app and push to registry
   community.docker.docker_image:
     build:
-      path: /home/terracloud/laravel
-    name: "{{ registry_ip }}:5000/terracloud-laravel"
+      path: /home/terracloud/laravel/sample-app-master
+    name: "{{ groups['masters'][0] }}:5000/terracloud-laravel"
     push: true
     source: build
-
-- name: Complete deployment image name
-  lineinfile:
-    path: /home/squalli/Documents/Epitech/Terracloud-Actions/app-kube/deployment.yaml
-    regexp: "*.image: terracloud.*"
-    line: "        image: '{{ registry_ip }}:5000/terracloud-laravel'"
+  when: inventory_hostname in groups['masters']
 
 # - name: Start laravel docker-compose
 #   become: true

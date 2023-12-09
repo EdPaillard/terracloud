@@ -18,25 +18,25 @@ spec:
     spec:
       containers:
       - name: terracloud
-        image: terracloud
+        image: terracloud-vm0.westeurope.cloudapp.azure.com:5000/terracloud-laravel
         ports:
         - containerPort: 80
         env:
-          - name: REACT_APP_API_URL
+          - name: MYSQL_DATABASE
             valueFrom:
               configMapKeyRef:
                 name: terracloud-configmap
-                key: backend_url
-          - name: REACT_APP_API_PORT
-            valueFrom:
-              configMapKeyRef:
-                name: terracloud-configmap
-                key: backend_port
-          - name: REACT_APP_SECRET_KEY
+                key: mysql_dbname
+          - name: MYSQL_USER
             valueFrom:
               secretKeyRef:
                 name: terracloud-secret
-                key: secret_key
+                key: mysql_user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: terracloud-secret
+                key: mysql_password
 ---
 apiVersion: apps/v1
 kind: Deployment
