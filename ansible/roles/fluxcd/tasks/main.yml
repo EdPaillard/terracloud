@@ -3,16 +3,17 @@
   get_url:
     url: https://fluxcd.io/install.sh
     dest: /tmp/install.sh
+    mode: '750'
 
 - name: Install flux
   shell: /tmp/install.sh
 
 - name: Fluxcd bootstrap
-  shell: flux boostrap github --token-auth --owner=EdPaillard --repository=terracloud --branch=release/k3s --path=../cluster/terracloud --personal
+  shell: flux bootstrap github --token-auth --owner=EdPaillard --repository=terracloud --branch=release/k3s --path=cluster/terracloud --personal
   environment:
     GITHUB_TOKEN: "{{ github_token }}"
 
-- name: Create a pod
+- name: Create Terracloud namespace
   kubernetes.core.k8s:
     state: present
     definition:
