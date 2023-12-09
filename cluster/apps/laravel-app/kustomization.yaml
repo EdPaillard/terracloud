@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+resources:
+  - deployment.yaml
+  - datas.yaml
+  - volumes.yaml
+  - service.yaml
+  - ingress.yaml
+# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+# kind: Kustomization
+# metadata:
+#   name: terracloud-laravel
+#   namespace: flux-system
+# spec:
+#   sourceRef:
+#     kind: GitRepository
+#     name: terracloud
+#   path: ./app-kube
+#   interval: 5m0s
+#   prune: true
+#   wait: true
+#   timeout: 5m0s
