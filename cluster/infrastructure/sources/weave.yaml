@@ -6,4 +6,4 @@ metadata:
   namespace: flux-system
 spec:
   interval: 60m
-  url: ghcr.io/weaveworks/wego-app
+  url: https://helm.gitops.weave.works
