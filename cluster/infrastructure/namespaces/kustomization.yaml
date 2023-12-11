@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - weaver.yaml
   - monitoring.yaml
-  - cert-manager.yaml
+  # - cert-manager.yaml

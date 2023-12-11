@@ -3,6 +3,6 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - grafana.yaml
-  - jetstack.yaml
+  # - jetstack.yaml
   - prometheus.yaml
   - weave.yaml

@@ -21,6 +21,8 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    service:
+      type: NodePort
     adminUser:
       create: true
       passwordHash: $2a$10$2LBXbImXzotydLOLDG1lJO..jR5jYZAovRHyNVHUktKbPKjHtIxuu
@@ -29,16 +31,17 @@ spec:
       repository: ghcr.io/weaveworks/wego-app
       tag: v0.36.0
     ingress:
-      enabled: yes
+      enabled: no
       annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
         cert-manager.io/cluster-issuer: letsencrypt-terracloud
-        cert-manager.io/common-name: fluxcd.terracloud.eu
+        cert-manager.io/common-name: fluxcd.terracloud.lifoto.co
       hosts:
-        - host: fluxcd.terracloud.eu
+        - host: fluxcd.terracloud.lifoto.co
           paths:
             - path: /
               pathType: ImplementationSpecific
       tls:
         - secretName: fluxcd-dashboard-tls
           hosts:
-            - fluxcd.terracloud.eu
+            - fluxcd.terracloud.lifoto.co

@@ -29,6 +29,8 @@ spec:
 
     grafana:
       enabled: true
+      service:
+        type: NodePort
       image:
         repository: grafana/grafana
       defaultDashboardsTimezone: Europe/Paris
@@ -37,7 +39,7 @@ spec:
       rbac:
         pspEnabled: false
       ingress:
-        enabled: true
+        enabled: false
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-terracloud
           cert-manager.io/common-name: grafana.terracloud.eu
@@ -77,6 +79,7 @@ spec:
       #     readOnly: true
       persistence:
         enabled: true
+        size: 500Mi
         # storageClassName: storage-class-test
         # existingClaim: pvc-grafana
     #   initChownData:
@@ -114,14 +117,14 @@ spec:
     prometheus:
       serviceAccount:
         name: "prometheus"
+      service:
+        type: NodePort
       ingress:
-        enabled: true
+        enabled: false
         annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
           cert-manager.io/cluster-issuer: "letsencrypt-terracloud"
-          cert-manager.io/common-name: prometheus.terracloud.eu
-        # annotations:
-        #   cert-manager.io/cluster-issuer: vault-issuer
-        #   cert-manager.io/common-name: prometheus.terracloud.internal
+          cert-manager.io/common-name: prometheus.terracloud.lifoto.co
         hosts:
           - prometheus.terracloud.eu
         ingressClassName: traefik
@@ -129,7 +132,8 @@ spec:
         tls:
           - secretName: prometheus-general-tls
             hosts:
-              - prometheus.terracloud.eu
+              - prometheus.terracloud.lifoto.co
+
       # prometheusSpec:
       #   secrets:
       #     - etcd-client-cert
