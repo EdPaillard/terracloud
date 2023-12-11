@@ -17,20 +17,20 @@ spec:
         app: terracloud
     spec:
       containers:
-      # - name: terracloud
-      #   image: terracloud-vm0.westeurope.cloudapp.azure.com:5000/terracloud-laravel
-      - name: php
-        image: registry.infra.connectwork.fr/epitech/sample-app/sample-app:master
-        imagePullPolicy: Always
-        command: ["php"]
-        args: ["artisan", "serve"]
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "250m"
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
+      - name: terracloud
+        image: terracloud-vm0.westeurope.cloudapp.azure.com:5000/terracloud-laravel
+      # - name: php
+      #   image: registry.infra.connectwork.fr/epitech/sample-app/sample-app:master
+      #   imagePullPolicy: Always
+      #   command: ["php"]
+      #   args: ["artisan", "serve"]
+      #   resources:
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
         ports:
         - containerPort: 80
         env:
