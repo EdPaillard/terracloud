@@ -12,7 +12,7 @@ spec:
         kind: HelmRepository
         name: prometheus
         namespace: flux-system
-      version: 45.31.1
+      version: 55.1.0
   interval: 5m
   install:
     crds: CreateReplace
@@ -40,15 +40,15 @@ spec:
         enabled: true
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-terracloud
-          cert-manager.io/common-name: grafana.terracloud.internal
+          cert-manager.io/common-name: grafana.terracloud.eu
         hosts:
-          - grafana.terracloud.internal
+          - grafana.terracloud.eu
         ingressClassName: traefik
         path: /
         tls:
           - secretName: grafana-general-tls
             hosts:
-            - grafana.terracloud.internal
+            - grafana.terracloud.eu
       sidecar:
         image:
           repository: kiwigrid/k8s-sidecar
@@ -77,70 +77,73 @@ spec:
       #     readOnly: true
       persistence:
         enabled: true
-        storageClassName: storage-class-test
-        existingClaim: pvc-grafana
-      initChownData:
-        enabled: false
-      grafana.ini:
-        auth.ldap:
-          enabled: false
-      ldap:
-        enabled: false
+        # storageClassName: storage-class-test
+        # existingClaim: pvc-grafana
+    #   initChownData:
+    #     enabled: false
+    #   grafana.ini:
+    #     auth.ldap:
+    #       enabled: false
+    #   ldap:
+    #     enabled: false
 
-    kubeControllerManager:
-      insecureSkipVerify: true  
+    # kubeControllerManager:
+    #   insecureSkipVerify: true  
 
-    kubeEtcd:
-      service:
-        enabled: true
-        port: 2379
-        targetPort: 2379
-      serviceMonitor:
-        scheme: https
-        serverName: localhost
-        caFile: /etc/prometheus/secrets/etcd-client-cert/etcd-ca
-        certFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client
-        keyFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client-key      
+    # kubeEtcd:
+    #   service:
+    #     enabled: true
+    #     port: 2379
+    #     targetPort: 2379
+    #   serviceMonitor:
+    #     scheme: https
+    #     serverName: localhost
+    #     caFile: /etc/prometheus/secrets/etcd-client-cert/etcd-ca
+    #     certFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client
+    #     keyFile: /etc/prometheus/secrets/etcd-client-cert/etcd-client-key      
 
-    kubeScheduler:
-      insecureSkipVerify: true   
+    # kubeScheduler:
+    #   insecureSkipVerify: true   
 
-    prometheus-node-exporter:
-      tolerations:
-        - key: "CriticalAddonsOnly"
-          operator: Exists
-          effect: "NoExecute"
+    # prometheus-node-exporter:
+    #   tolerations:
+    #     - key: "CriticalAddonsOnly"
+    #       operator: Exists
+    #       effect: "NoExecute"
 
     prometheus:
       serviceAccount:
         name: "prometheus"
       ingress:
         enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: "letsencrypt-terracloud"
+          cert-manager.io/common-name: prometheus.terracloud.eu
         # annotations:
         #   cert-manager.io/cluster-issuer: vault-issuer
         #   cert-manager.io/common-name: prometheus.terracloud.internal
         hosts:
-          - prometheus.terracloud.internal
+          - prometheus.terracloud.eu
         ingressClassName: traefik
         pathType: ImplementationSpecific
         tls:
           - secretName: prometheus-general-tls
             hosts:
-              - prometheus.terracloud.internal
-      prometheusSpec:
-        secrets:
-          - etcd-client-cert
-          - ca-cert
-        retention: 62d
-        retentionSize: 35GB
-        storageSpec:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: storage-class-test
-              accessModes: ["ReadWriteOnce"]
-              resources:
-                requests:
-                  storage: 36Gi
+              - prometheus.terracloud.eu
+      # prometheusSpec:
+      #   secrets:
+      #     - etcd-client-cert
+      #     - ca-cert
+      #   retention: 62d
+      #   retentionSize: 35GB
+      #   storageSpec:
+      #     volumeClaimTemplate:
+      #       spec:
+      #         storageClassName: storage-class-test
+      #         accessModes: ["ReadWriteOnce"]
+      #         resources:
+      #           requests:
+      #             storage: 36Gi
         #ruleNamespaceSelector:
         #  any: true
         #serviceMonitorSelector:

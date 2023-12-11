@@ -8,10 +8,10 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: https
     cert-manager.io/cluster-issuer: letsencrypt-terracloud
-    cert-manager.io/common-name: terracloud-lil.local
+    cert-manager.io/common-name: terracloud-lil.eu
 spec:
   rules:
-  - host: terracloud-lil.local
+  - host: terracloud-lil.eu
     http:
       paths:
       - path: /
@@ -23,5 +23,5 @@ spec:
               number: 80
   tls:
   - hosts:
-    - terracloud-lil.local
+    - terracloud-lil.eu
     secretName: terracloud-lil-tls
