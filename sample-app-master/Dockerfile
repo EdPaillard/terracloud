@@ -18,7 +18,7 @@ ENV WEB_DOCUMENT_ROOT /app/public
 # ENV APP_ENV production
 WORKDIR /app
 COPY . .
-# COPY migrate.sh /opt/docker/provision/entrypoint.d/migrate.sh
+COPY migrate.sh /opt/docker/provision/entrypoint.d/migrate.sh
 
 # RUN cp -n .env.example .env
 

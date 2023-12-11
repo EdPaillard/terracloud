@@ -6,8 +6,6 @@
     ports:
      - "5000:5000"
     restart_policy: always
-    volumes:
-      - /etc/prometheus:/etc/prometheus
   when: inventory_hostname in groups['masters']
 
 - name: Write daemon.json
@@ -25,7 +23,7 @@
   ansible.builtin.git:
     repo: https://github.com/EdPaillard/terracloud
     dest: /home/terracloud/laravel
-    version: HEAD
+    version: release/k3s
 
 - name: Copy .env
   template:
