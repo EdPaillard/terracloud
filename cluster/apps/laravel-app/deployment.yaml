@@ -22,17 +22,32 @@ spec:
         ports:
         - containerPort: 80
         env:
-          - name: MYSQL_DATABASE
+          - name: DB_DATABASE
             valueFrom:
               configMapKeyRef:
                 name: terracloud-configmap
                 key: mysql_dbname
-          - name: MYSQL_USER
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: terracloud-configmap
+                key: mysql_host
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: terracloud-configmap
+                key: mysql_post
+          - name: DB_CONNECTION
+            valueFrom:
+              configMapKeyRef:
+                name: terracloud-configmap
+                key: mysql_connection
+          - name: DB_USERNAME
             valueFrom:
               secretKeyRef:
                 name: terracloud-secret
                 key: mysql_user
-          - name: MYSQL_PASSWORD
+          - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: terracloud-secret

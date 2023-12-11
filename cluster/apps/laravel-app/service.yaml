@@ -18,9 +18,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: terracloud-mysql
+  name: terracloud-mysql-svc
   labels:
-    app: terracloud-mysql
+    app: terracloud-mysql-svc
   namespace: terracloud
 spec:
   selector:

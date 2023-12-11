@@ -17,4 +17,6 @@ metadata:
   namespace: terracloud
 data:
   mysql_dbname: laravel
-  mysql_host: terracloud-mysql
+  mysql_host: terracloud-mysql-svc
+  mysql_connection: mysql
+  mysql_port: "3306"

@@ -1,0 +1,4 @@
+mirrors:
+  terracloud-vm0.westeurope.cloudapp.azure.com:5000:
+    endpoint:
+      - "http://terracloud-vm0.westeurope.cloudapp.azure.com:5000"

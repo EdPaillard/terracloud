@@ -53,6 +53,12 @@
   register: server_token
   when: inventory_hostname in groups['masters']
 
+- name: Copy mirror registry conf
+  become: yes
+  copy:
+    src: ../files/registries.yaml
+    dest: /etc/rancher/k3s/registries.yaml
+
 - debug:
     msg: "{{ hostvars[groups['masters'][0]]['server_token'].content | b64decode }}"
     
@@ -68,7 +74,7 @@
   become: yes
   service:
     name: k3s
-    state: started
+    state: restarted
     enabled: yes
   when: inventory_hostname in groups['masters']
 
@@ -76,7 +82,7 @@
   become: yes
   service:
     name: k3s-agent
-    state: started
+    state: restarted
     enabled: yes
   when: inventory_hostname in groups['workers']
 
