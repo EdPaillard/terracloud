@@ -36,7 +36,7 @@ spec:
             valueFrom:
               configMapKeyRef:
                 name: terracloud-configmap
-                key: mysql_post
+                key: mysql_port
           - name: DB_CONNECTION
             valueFrom:
               configMapKeyRef:

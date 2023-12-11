@@ -20,6 +20,7 @@
   ansible.builtin.git:
     repo: https://github.com/EdPaillard/terracloud
     dest: /home/terracloud/laravel
+    version: HEAD
 
 - name: Copy .env
   template:
