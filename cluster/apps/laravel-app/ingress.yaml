@@ -1,27 +1,27 @@
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: terracloud-ingress
-#   namespace: terracloud
-#   labels:
-#     app: terracloud-ingress
-#   annotations:
-#     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-#     cert-manager.io/cluster-issuer: letsencrypt-terracloud
-#     cert-manager.io/common-name: terracloud-lil.lifoto.co
-# spec:
-#   rules:
-#   - host: terracloud-lil.lifoto.co
-#     http:
-#       paths:
-#       - path: /
-#         pathType: Prefix
-#         backend:
-#           service:
-#             name: terracloud-service
-#             port: 
-#               number: 80
-#   tls:
-#   - hosts:
-#     - terracloud-lil.lifoto.co
-#     secretName: terracloud-lil-tls
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: terracloud-ingress
+  namespace: terracloud
+  labels:
+    app: terracloud-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    cert-manager.io/cluster-issuer: letsencrypt-terracloud
+    cert-manager.io/common-name: terracloud.lifoto.co
+spec:
+  rules:
+  - host: terracloud.lifoto.co
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: terracloud-service
+            port: 
+              number: 80
+  tls:
+  - hosts:
+    - terracloud.lifoto.co
+    secretName: terracloud-lil-tls

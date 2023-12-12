@@ -32,6 +32,13 @@ create() {
     vm_names_output=$(echo "$raw_vm_names" | sed -e 's/\[//g' -e 's/\]//g' -e 's/"//g' -e 's/,/ /g')
     vm_names=($vm_names_output)
     echo -e "${vm_names[@]}:\n"
+    echo -e "\n${GREEN}Outpout VM IP addresses${ENDCOLOR}:\n"
+    ipaddresses=()
+    for vm_name in "${vm_names[@]}"; do
+        vm=$(echo $vm_name | tr '[:upper:]' '[:lower:]')
+        ipaddresses+=($(az network public-ip show --resource-group t-clo-901-lil-2-items --name $vm | jq '.ipAddress' | tr -d '"'))
+    done
+    echo -e "${ipaddresses[@]}\n"
     echo -e "\n${GREEN}Outpout VM FQDNs${ENDCOLOR}:\n"
     raw_vm_fqdns=$(terraform output vm_fqdn)
     vm_fqdns_output=$(echo "$raw_vm_fqdns" | sed -e 's/\[//g' -e 's/\]//g' -e 's/"//g' -e 's/,/ /g')
@@ -49,9 +56,10 @@ create() {
     echo -e "all:\n  hosts:" > ansible/inventory/hosts.yml
 
     echo -e "\n${GREEN}Completing hosts.yml with fqdns${ENDCOLOR}:\n"
-    for vm_fqdn in "${vm_fqdns[@]}"; do
-        echo -e "${vm_fqdn}\n"
-        echo -e "    $vm_fqdn:" >> ansible/inventory/hosts.yml
+    for ((i = 0; i < ${#vm_fqdns[@]}; i++)); do
+        echo -e "${vm_fqdns[i]}: ${ipaddresses[i]}\n"
+        echo -e "    ${vm_fqdns[i]}:" >> ansible/inventory/hosts.yml
+        echo -e "      ansible_host: ${ipaddresses[i]}" >> ansible/inventory/hosts.yml
     done
 
     echo -e "\n${GREEN}Adding groups to hosts.yml${ENDCOLOR}:\n"
@@ -60,6 +68,19 @@ create() {
     echo -e "    workers:\n      hosts:" >> ansible/inventory/hosts.yml
     echo -e "        ${vm_fqdns[1]}:" >> ansible/inventory/hosts.yml
     echo -e "        ${vm_fqdns[2]}:" >> ansible/inventory/hosts.yml
+
+    # echo -e "\n${GREEN}Completing hosts.yml with fqdns${ENDCOLOR}:\n"
+    # for ip in "${ipaddresses[@]}"; do
+    #     echo -e "${ip}\n"
+    #     echo -e "    $ip:" >> ansible/inventory/hosts.yml
+    # done
+
+    # echo -e "\n${GREEN}Adding groups to hosts.yml${ENDCOLOR}:\n"
+    # echo -e "  children:\n    masters:\n      hosts:" >> ansible/inventory/hosts.yml
+    # echo -e "        ${ipaddresses[0]}:" >> ansible/inventory/hosts.yml
+    # echo -e "    workers:\n      hosts:" >> ansible/inventory/hosts.yml
+    # echo -e "        ${ipaddresses[1]}:" >> ansible/inventory/hosts.yml
+    # echo -e "        ${ipaddresses[2]}:" >> ansible/inventory/hosts.yml
 
     echo -e "\n${GREEN}Running Ansible playbook${ENDCOLOR}:\n"
     ansible-playbook -i ansible/inventory/hosts.yml ansible/configuration.yml

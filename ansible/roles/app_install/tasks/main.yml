@@ -14,6 +14,12 @@
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
 
+- name: Reload docker
+  become: yes
+  service:
+    name: docker
+    state: reloaded
+
 - name: Remove app folder
   file:
     path: /home/terracloud/laravel

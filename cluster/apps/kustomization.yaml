@@ -5,4 +5,4 @@ resources:
   - prometheus
   - fluxcd-dashboard
   - loki
-  # - clusterissuer.yaml
+  - clusterissuer.yaml

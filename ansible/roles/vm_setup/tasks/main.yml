@@ -1,4 +1,6 @@
 ---
+- debug:
+    var: ansible_host
 - name: Install apt utilities
   become: yes
   apt:

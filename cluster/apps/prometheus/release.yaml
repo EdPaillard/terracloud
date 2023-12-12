@@ -30,7 +30,7 @@ spec:
     grafana:
       enabled: true
       service:
-        type: NodePort
+        type: ClusterIP
       image:
         repository: grafana/grafana
       defaultDashboardsTimezone: Europe/Paris
@@ -39,18 +39,18 @@ spec:
       rbac:
         pspEnabled: false
       ingress:
-        enabled: false
+        enabled: true
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-terracloud
-          cert-manager.io/common-name: grafana.terracloud.eu
+          cert-manager.io/common-name: grafana.terracloud.lifoto.co
         hosts:
-          - grafana.terracloud.eu
+          - grafana.terracloud.lifoto.co
         ingressClassName: traefik
         path: /
         tls:
           - secretName: grafana-general-tls
             hosts:
-            - grafana.terracloud.eu
+            - grafana.terracloud.lifoto.co
       sidecar:
         image:
           repository: kiwigrid/k8s-sidecar
@@ -118,15 +118,15 @@ spec:
       serviceAccount:
         name: "prometheus"
       service:
-        type: NodePort
+        type: ClusterIP
       ingress:
-        enabled: false
+        enabled: true
         annotations:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           cert-manager.io/cluster-issuer: "letsencrypt-terracloud"
           cert-manager.io/common-name: prometheus.terracloud.lifoto.co
         hosts:
-          - prometheus.terracloud.eu
+          - prometheus.terracloud.lifoto.co
         ingressClassName: traefik
         pathType: ImplementationSpecific
         tls:
