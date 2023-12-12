@@ -22,7 +22,7 @@ spec:
     crds: CreateReplace
   values:
     service:
-      type: NodePort
+      type: ClusterIP
     adminUser:
       create: true
       passwordHash: $2a$10$2LBXbImXzotydLOLDG1lJO..jR5jYZAovRHyNVHUktKbPKjHtIxuu
@@ -31,7 +31,7 @@ spec:
       repository: ghcr.io/weaveworks/wego-app
       tag: v0.36.0
     ingress:
-      enabled: no
+      enabled: yes
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         cert-manager.io/cluster-issuer: letsencrypt-terracloud
