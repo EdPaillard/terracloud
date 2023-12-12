@@ -32,6 +32,12 @@ create() {
     vm_names_output=$(echo "$raw_vm_names" | sed -e 's/\[//g' -e 's/\]//g' -e 's/"//g' -e 's/,/ /g')
     vm_names=($vm_names_output)
     echo -e "${vm_names[@]}:\n"
+    echo -e "\n${GREEN}Outpout VM IP addresses${ENDCOLOR}:\n"
+    ipaddresses=()
+    for vm_name in "${vm_names[@]}"; do
+        vm=$($vm_name | tr '[:upper:]' '[:lower:]')
+        ipaddresses+=$(az network public-ip show --resource-group t-clo-901-lil-2-items --name $vm | jq '.ipAddress')
+    done
     echo -e "\n${GREEN}Outpout VM FQDNs${ENDCOLOR}:\n"
     raw_vm_fqdns=$(terraform output vm_fqdn)
     vm_fqdns_output=$(echo "$raw_vm_fqdns" | sed -e 's/\[//g' -e 's/\]//g' -e 's/"//g' -e 's/,/ /g')
