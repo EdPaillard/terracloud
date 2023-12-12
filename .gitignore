@@ -26,3 +26,4 @@ Homestead.json
 group_vars
 .env
 .ssh
+.env.json
