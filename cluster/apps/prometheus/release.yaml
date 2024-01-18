@@ -69,7 +69,7 @@ spec:
           type: loki
           uid: Terracloud-Logs
           url: http://loki.monitoring:3100/
-          access: proxy
+          # access: proxy
           isDefault: false
       # extraConfigmapMounts: 
       #   - name: grafana-cacert
