@@ -33,10 +33,10 @@ spec:
           - host: loki.terracloud.lifoto.co
             paths:
             - /
-        tls:
-          - secretName: loki-tls
-            hosts:
-              - loki.terracloud.lifoto.co
+        # tls:
+        #   - secretName: loki-tls
+        #     hosts:
+        #       - loki.terracloud.lifoto.co
       config:
         compactor:
           retention_enabled: true
