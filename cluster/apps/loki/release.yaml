@@ -27,7 +27,16 @@ spec:
       enabled: true
       isDefault: false
       ingress:
-        enabled: false
+        enabled: true
+        annotations: {}
+        hosts:
+          - host: loki.terracloud.lifoto.co
+            paths:
+            - /
+        tls:
+          - secretName: loki-tls
+            hosts:
+              - loki.terracloud.lifoto.co
       config:
         compactor:
           retention_enabled: true
