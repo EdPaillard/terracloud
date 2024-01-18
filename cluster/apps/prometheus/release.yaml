@@ -68,7 +68,7 @@ spec:
         - name: Terracloud-Logs
           type: loki
           uid: Terracloud-Logs
-          url: http://loki:3100/
+          url: http://loki.monitoring:3100/
           access: proxy
           isDefault: false
       # extraConfigmapMounts: 
